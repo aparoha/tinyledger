@@ -2,7 +2,11 @@
 
 This ledger system provides a simple yet effective way to manage financial transactions and accounts using double-entry bookkeeping principles. Through RESTful APIs, it allows creating and retrieving accounts, recording transactions with debit and credit entries, and querying transaction history and account balances. Each transaction consists of multiple entries that debit or credit different accounts, ensuring that the total debits equal total credits, thereby maintaining the accounting balance. The system stores data in-memory for fast access and supports paginated transaction history retrieval to efficiently handle large datasets.
 
+The service is implemented using API First Approach where web server is generated using OpenAPI spec (spec/tinyledger.yaml) 
+
 ## Key Features and API Capabilities
+
+OpenAPI spec is created under spec/tinyledger.yaml
 
 - **Account Management**
     - Create accounts with specific types (Asset, Liability)
