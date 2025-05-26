@@ -1,15 +1,16 @@
 package com.teya.tinyledger.controller;
 
+import com.teya.tinyledger.common.ApiUtils;
+import com.teya.tinyledger.common.StringUtils;
+import com.teya.tinyledger.gen.server.api.DefaultApiDelegate;
 import com.teya.tinyledger.gen.server.model.AccountDto;
 import com.teya.tinyledger.gen.server.model.TransactionDto;
 import com.teya.tinyledger.gen.server.model.TransactionHistoryDto;
 import com.teya.tinyledger.gen.server.model.TransactionRequestDto;
 import com.teya.tinyledger.service.AccountFacade;
-import com.teya.tinyledger.gen.server.api.DefaultApiDelegate;
 import com.teya.tinyledger.service.TransactionFacade;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
 
 @RestController
@@ -21,56 +22,60 @@ public class LedgerController implements DefaultApiDelegate {
         this.accountFacade = accountFacade;
         this.transactionFacade = transactionFacade;
     }
+
+    /**
+     * Creates a new account.
+     * Returns 400 if name or type is null/blank.
+     * Returns 201 with the created account otherwise.
+     */
     @Override
     public ResponseEntity<AccountDto> createAccount(String name, String type) {
-        if (name == null || type == null || name.isBlank() || type.isBlank()) {
-            return ResponseEntity.badRequest().build();
+        if (StringUtils.isNullOrBlank(name) || StringUtils.isNullOrBlank(type)) {
+            return ResponseEntity.badRequest().build(); // Input validation
         }
         return ResponseEntity
                 .status(201)
                 .body(accountFacade.createAccount(name, type));
     }
 
+    /**
+     * Retrieves all accounts.
+     * Returns 200 with list of accounts, or 500 on error.
+     */
     @Override
     public ResponseEntity<List<AccountDto>> getAccounts() {
-        try {
-            return ResponseEntity.ok(accountFacade.getAccounts());
-        } catch (Exception e) {
-            return ResponseEntity.status(500).build();
-        }
+        return ApiUtils.handleRequest(accountFacade::getAccounts);
     }
 
+    /**
+     * Creates a new transaction.
+     * Returns 400 if input is invalid.
+     * Returns 201 with created transaction.
+     * Returns 500 on other errors.
+     */
     @Override
     public ResponseEntity<TransactionDto> createTransaction(TransactionRequestDto transactionRequestDto) {
-        try {
-            TransactionDto transactionDto = transactionFacade.createTransaction(transactionRequestDto);
-            return ResponseEntity.status(201).body(transactionDto);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(500).build();
-        }
+        return ApiUtils.handleRequest(() -> transactionFacade
+                .createTransaction(transactionRequestDto), IllegalArgumentException.class, 400);
     }
 
+    /**
+     * Gets the balance for a specific account.
+     * Returns 404 if account not found.
+     * Returns 200 with balance or 500 on error.
+     */
     @Override
     public ResponseEntity<Double> getAccountBalance(Integer accountId) {
-        try {
-            double balance = accountFacade.getAccountBalance(accountId);
-            return ResponseEntity.ok(balance);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(404).build(); // Return 404 if account is not found
-        } catch (Exception e) {
-            return ResponseEntity.status(500).build(); // Return 500 if there are other errors
-        }
+        return ApiUtils.handleRequest(() -> accountFacade
+                .getAccountBalance(accountId), IllegalArgumentException.class, 404);
     }
 
+    /**
+     * Retrieves transaction history.
+     * Returns 200 with list or 500 on error.
+     */
     @Override
     public ResponseEntity<List<TransactionHistoryDto>> getTransactionHistory() {
-        try {
-            List<TransactionHistoryDto> history = transactionFacade.getAllTransactionHistory();
-            return ResponseEntity.ok(history);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).build();
-        }
+        return ApiUtils.handleRequest(transactionFacade::getAllTransactionHistory);
     }
 }

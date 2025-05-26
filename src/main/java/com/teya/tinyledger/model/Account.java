@@ -15,7 +15,6 @@ public class Account {
         this.balance = 0.0;
     }
 
-    // Getters and Setters
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
 
