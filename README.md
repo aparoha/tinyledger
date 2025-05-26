@@ -104,7 +104,7 @@ The project includes two helper scripts:
 
 ---
 
-### How to Run
+### How to Run using jar
 
 1. **Start the Web Server**
 
@@ -115,7 +115,32 @@ The project includes two helper scripts:
 
 2. **Run curl requests simulating ledger entries for banking system**
 
-   Run the `test.sh` script from the project root directory:
+   Run the `test.sh` script from the project root directory (in separate terminal):
 
   ```bash
   ./test.sh
+
+---
+
+### How to Run using docker
+
+1. **Start the Web Server**
+
+   Run the `run-container.sh` script from the project root directory:
+
+   ```bash
+   ./run-container.sh
+
+2. **Run curl requests simulating ledger entries for banking system**
+
+   Run the `test.sh` script from the project root directory (in separate terminal):
+
+  ```bash
+  ./test.sh
+
+3. **Stop container**
+
+   Run the `stop-container.sh` script from the project root directory:
+
+  ```bash
+  ./stop-container.sh
